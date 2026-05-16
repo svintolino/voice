@@ -26,3 +26,6 @@ A standalone Dograh release bundle for self-hosted voice-agent testing and rollo
 
 ## License
 Dograh is BSD 2-Clause upstream; this bundle follows the upstream project structure and release notes.
+
+## Dograh Workflow Import/Export
+- See `dograh_workflow_import_export.md` for the workflow import/export behavior and supported JSON shapes.
