@@ -117,7 +117,7 @@ services:
       - "127.0.0.1:13010:3010"
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:13010 || exit 1"]
       interval: 30s
