@@ -40,5 +40,5 @@ docker compose -f docker-compose.standalone.yaml --env-file .env pull
 docker compose -f docker-compose.standalone.yaml --env-file .env up -d
 
 echo
- echo "Dograh is starting on your Mac. Open http://localhost:3010 after a minute or two."
+ echo "Dograh is starting on your Mac. Open http://localhost:13010 after a minute or two."
  echo "If you want, run: cd release && ./verify-install.sh"

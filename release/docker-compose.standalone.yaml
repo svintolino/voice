@@ -61,7 +61,7 @@ services:
     environment:
       ENVIRONMENT: ${ENVIRONMENT:-oss}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      BACKEND_API_ENDPOINT: ${BACKEND_API_ENDPOINT:-http://localhost:8000}
+      BACKEND_API_ENDPOINT: ${BACKEND_API_ENDPOINT:-http://localhost:18000}
       DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres
       REDIS_URL: redis://:${REDIS_PASSWORD:-redissecret}@redis:6379
       ENABLE_AWS_S3: "false"
@@ -85,7 +85,7 @@ services:
       AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-}
       AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:-}
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:18000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -97,7 +97,7 @@ services:
         condition: service_started
     healthcheck:
       test:
-        ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read()\""]
+        ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:18000/api/v1/health').read()\""]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -110,15 +110,15 @@ services:
       BACKEND_URL: ${BACKEND_URL:-http://api:8000}
       NODE_ENV: oss
       ENABLE_TELEMETRY: ${ENABLE_TELEMETRY:-false}
-      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:18000}
       NEXT_PUBLIC_NODE_ENV: ${NEXT_PUBLIC_NODE_ENV:-oss}
     ports:
-      - "127.0.0.1:3010:3010"
+      - "127.0.0.1:13010:3010"
     depends_on:
       api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3010 || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:13010 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
