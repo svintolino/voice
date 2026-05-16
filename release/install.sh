@@ -19,13 +19,13 @@ if [ ! -f .env ]; then
   echo "Created .env from .env.example"
 fi
 
-if grep -q 'REPLACE_ME' docker-compose.standalone.yaml; then
+if grep -q 'REPLACE_ME' docker-compose.yml; then
   echo "Warning: image digests still contain REPLACE_ME placeholders." >&2
   echo "Pin the release digests before production use." >&2
 fi
 
-docker compose -f docker-compose.standalone.yaml --env-file .env pull
+docker compose -f docker-compose.yml --env-file .env pull
 
-docker compose -f docker-compose.standalone.yaml --env-file .env up -d
+docker compose -f docker-compose.yml --env-file .env up -d
 
 echo "Dograh is starting. Open the UI at http://localhost:3010 once healthy."

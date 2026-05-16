@@ -11,10 +11,10 @@ fi
 
 services=(postgres redis minio cloudflared api ui)
 
-docker compose -f docker-compose.standalone.yaml --env-file .env ps
+docker compose -f docker-compose.yml --env-file .env ps
 
 for svc in "${services[@]}"; do
-  status="$(docker compose -f docker-compose.standalone.yaml --env-file .env ps --format json "$svc" 2>/dev/null || true)"
+  status="$(docker compose -f docker-compose.yml --env-file .env ps --format json "$svc" 2>/dev/null || true)"
   echo "Checked ${svc}: ${status:-unknown}"
 done
 

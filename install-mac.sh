@@ -20,7 +20,7 @@ if [ ! -f .env ]; then
   cp .env.example .env
 fi
 
-if grep -q "REPLACE_ME" docker-compose.standalone.yaml; then
+if grep -q "REPLACE_ME" docker-compose.yml; then
   echo "Warning: image digests still contain placeholders. This is fine for a first local test, but not production." >&2
 fi
 
@@ -36,8 +36,8 @@ rm -f .env.bak
 sed -i.bak "s|^MINIO_PUBLIC_ENDPOINT=.*|MINIO_PUBLIC_ENDPOINT=http://localhost:9000|" .env || true
 rm -f .env.bak
 
-docker compose -f docker-compose.standalone.yaml --env-file .env pull
-docker compose -f docker-compose.standalone.yaml --env-file .env up -d
+docker compose -f docker-compose.yml --env-file .env pull
+docker compose -f docker-compose.yml --env-file .env up -d
 
 echo
  echo "Dograh is starting on your Mac. Open http://localhost:13010 after a minute or two."

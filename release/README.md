@@ -3,7 +3,7 @@
 This folder contains a pinned-friendly, security-reviewable release bundle for Dograh.
 
 ## Files
-- `docker-compose.standalone.yaml` — release compose file
+- `docker-compose.yml` — release compose file
 - `.env.example` — local copy template
 - `install.sh` — install/start helper
 - `verify-install.sh` — basic health verification
