@@ -18,7 +18,7 @@ for svc in "${services[@]}"; do
   echo "Checked ${svc}: ${status:-unknown}"
 done
 
-curl -fsS http://localhost:8000/api/v1/health >/dev/null
-curl -fsS http://localhost:3010 >/dev/null
+curl -fsS http://localhost:18000/api/v1/health >/dev/null
+curl -fsS http://localhost:13010 >/dev/null
 
 echo "Health checks passed."
