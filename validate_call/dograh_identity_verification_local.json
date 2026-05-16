@@ -1,0 +1,130 @@
+{
+  "name": "Identity Verification Intake",
+  "workflow_definition": {
+    "nodes": [
+      {
+        "id": "start-1",
+        "type": "startCall",
+        "position": {
+          "x": 180,
+          "y": 180
+        },
+        "data": {
+          "name": "Start Call",
+          "greeting_type": "text",
+          "greeting": "I’m Michelle. How can I help you today?",
+          "prompt": "Pause and listen first. Then say: 'Before we can proceed, I need to confirm who I’m speaking with. Can you please state your full name and SSN?' After the caller responds, capture the name and ID and move to verification.",
+          "allow_interrupt": true,
+          "tool_uuids": [
+            "VERIFY_TOOL_UUID_HERE"
+          ],
+          "document_uuids": []
+        }
+      },
+      {
+        "id": "agent-verify-1",
+        "type": "agentNode",
+        "position": {
+          "x": 520,
+          "y": 180
+        },
+        "data": {
+          "name": "Verify Identity",
+          "prompt": "Call the verification tool with full_name and id_number. If verified, continue. Otherwise, do not discuss the account.",
+          "allow_interrupt": true,
+          "tool_uuids": [
+            "VERIFY_TOOL_UUID_HERE"
+          ],
+          "document_uuids": []
+        }
+      },
+      {
+        "id": "agent-verified-1",
+        "type": "agentNode",
+        "position": {
+          "x": 860,
+          "y": 120
+        },
+        "data": {
+          "name": "Verified Branch",
+          "prompt": "Say: 'Thank you, {{caller_full_name}} — you’ve been verified. We can continue.' Then move into a concise, professional next step like confirming the best time to continue or briefly discussing the account status.",
+          "allow_interrupt": true,
+          "tool_uuids": [],
+          "document_uuids": []
+        }
+      },
+      {
+        "id": "agent-fallback-1",
+        "type": "agentNode",
+        "position": {
+          "x": 860,
+          "y": 300
+        },
+        "data": {
+          "name": "Fallback Branch",
+          "prompt": "Say: 'Thanks. I’m not able to verify your identity right now, so I can’t discuss the account. If you’d like, I can connect you with a representative or arrange a callback.' Keep it calm, polite, and non-disclosing.",
+          "allow_interrupt": true,
+          "tool_uuids": [],
+          "document_uuids": []
+        }
+      },
+      {
+        "id": "end-1",
+        "type": "endCall",
+        "position": {
+          "x": 1180,
+          "y": 220
+        },
+        "data": {
+          "name": "End Call",
+          "prompt": "Close the conversation politely.",
+          "allow_interrupt": false,
+          "tool_uuids": [],
+          "document_uuids": []
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-verify",
+        "source": "start-1",
+        "target": "agent-verify-1",
+        "data": {
+          "condition": "next"
+        }
+      },
+      {
+        "id": "e-verify-yes",
+        "source": "agent-verify-1",
+        "target": "agent-verified-1",
+        "data": {
+          "condition": "verified"
+        }
+      },
+      {
+        "id": "e-verify-no",
+        "source": "agent-verify-1",
+        "target": "agent-fallback-1",
+        "data": {
+          "condition": "not_verified"
+        }
+      },
+      {
+        "id": "e-verified-end",
+        "source": "agent-verified-1",
+        "target": "end-1",
+        "data": {
+          "condition": "done"
+        }
+      },
+      {
+        "id": "e-fallback-end",
+        "source": "agent-fallback-1",
+        "target": "end-1",
+        "data": {
+          "condition": "done"
+        }
+      }
+    ]
+  }
+}
