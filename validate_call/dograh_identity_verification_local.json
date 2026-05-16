@@ -12,8 +12,8 @@
         "data": {
           "name": "Start Call",
           "greeting_type": "text",
-          "greeting": "I’m Michelle. How can I help you today?",
-          "prompt": "Pause and listen first. Then say: 'Before we can proceed, I need to confirm who I’m speaking with. Can you please state your full name and SSN?' After the caller responds, capture the name and ID and move to verification.",
+          "greeting": "Hej, du har ringet til The Mill. Hvordan kan jeg hjælpe dig i dag?",
+          "prompt": "Lyt først til den, der ringer. Sig derefter: 'Før vi kan fortsætte, skal jeg bekræfte, hvem jeg taler med. Kan du venligst oplyse dit fulde navn og dit CPR-nummer?' Efter svar, fang navn og ID og gå videre til verifikation.",
           "allow_interrupt": true,
           "tool_uuids": [
             "VERIFY_TOOL_UUID_HERE"
@@ -47,7 +47,7 @@
         },
         "data": {
           "name": "Verified Branch",
-          "prompt": "Say: 'Thank you, {{caller_full_name}} — you’ve been verified. We can continue.' Then move into a concise, professional next step like confirming the best time to continue or briefly discussing the account status.",
+          "prompt": "Sig: 'Tak, {{caller_full_name}} — du er blevet verificeret. Vi kan fortsætte.' Fortsæt derefter med et kort, professionelt næste skridt, f.eks. at bekræfte det bedste tidspunkt at fortsætte eller kort tale om kontoen.",
           "allow_interrupt": true,
           "tool_uuids": [],
           "document_uuids": []
@@ -62,7 +62,7 @@
         },
         "data": {
           "name": "Fallback Branch",
-          "prompt": "Say: 'Thanks. I’m not able to verify your identity right now, so I can’t discuss the account. If you’d like, I can connect you with a representative or arrange a callback.' Keep it calm, polite, and non-disclosing.",
+          "prompt": "Sig: 'Tak. Jeg kan ikke bekræfte din identitet lige nu, så jeg kan ikke tale om kontoen. Hvis du vil, kan jeg stille dig videre til en medarbejder eller arrangere et callback.' Hold tonen rolig, høflig og uden kontooplysninger.",
           "allow_interrupt": true,
           "tool_uuids": [],
           "document_uuids": []
