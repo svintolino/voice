@@ -1,0 +1,131 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17@sha256:REPLACE_ME
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7@sha256:REPLACE_ME
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-redissecret}"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redissecret}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio@sha256:REPLACE_ME
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-https://localhost:3010}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest@sha256:REPLACE_ME
+    command: tunnel --no-autoupdate --url http://api:8000 --metrics 0.0.0.0:2000
+    ports:
+      - "127.0.0.1:2000:2000"
+    restart: unless-stopped
+
+  api:
+    image: ${REGISTRY:-ghcr.io/dograh-hq}/dograh-api:${DOGRAH_VERSION:-latest}
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-oss}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      BACKEND_API_ENDPOINT: ${BACKEND_API_ENDPOINT:-http://localhost:8000}
+      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redissecret}@redis:6379
+      ENABLE_AWS_S3: "false"
+      MINIO_ENDPOINT: minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-voice-audio}
+      MINIO_SECURE: "false"
+      FASTAPI_WORKERS: ${FASTAPI_WORKERS:-1}
+      TURN_HOST: ${TURN_HOST:-}
+      TURN_SECRET: ${TURN_SECRET:-}
+      FORCE_TURN_RELAY: ${FORCE_TURN_RELAY:-false}
+      OSS_JWT_SECRET: ${OSS_JWT_SECRET:-change-me-in-production}
+      ENABLE_TELEMETRY: ${ENABLE_TELEMETRY:-false}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-}
+      AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      cloudflared:
+        condition: service_started
+    healthcheck:
+      test:
+        ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read()\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  ui:
+    image: ${REGISTRY:-ghcr.io/dograh-hq}/dograh-ui:${DOGRAH_VERSION:-latest}
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://api:8000}
+      NODE_ENV: oss
+      ENABLE_TELEMETRY: ${ENABLE_TELEMETRY:-false}
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+      NEXT_PUBLIC_NODE_ENV: ${NEXT_PUBLIC_NODE_ENV:-oss}
+    ports:
+      - "127.0.0.1:3010:3010"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3010 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
